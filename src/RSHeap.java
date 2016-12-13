@@ -43,18 +43,18 @@ public class RSHeap {
             deleteMin();
             out.write(smallest);
             int next = in.read();
-            if(next >= smallest){ //next fits in this run.
-                insert(next); //add next to heap.
-            } else {
+            if(next >= smallest){ //Checks if next fits in the current run.
+                insert(next); //Add next to heap.
+            } else { //Add next to deadspace
                 ++deadspace;
                 memory[memorySize - deadspace] = next;
             }
-            if(heapSize == 0){
+            if(heapSize == 0){ //Free the deadspace and add it's contents to the heap.
                 deadspace = 0;
                 buildHeap(memory);
             }
         }
-        while (heapSize > 0){
+        while (heapSize > 0){ //Write the rest of the heap to out.
             System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents in is empty: ");
             for(int number : memory){
@@ -66,7 +66,7 @@ public class RSHeap {
             out.write(findMin());
             deleteMin();
         }
-        if (deadspace > 0){
+        if (deadspace > 0){ //Build a heap with the contents of the deadspace
             System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents : ");
             for(int number : memory){
@@ -87,17 +87,14 @@ public class RSHeap {
             System.out.println("");
             out.printDiskContents();
         }
-        while (heapSize > 0){
+        while (heapSize > 0){ //Write the remaining numbers in the heap to out.
             out.write(findMin());
             deleteMin();
         }
-
-        //int[] array = new int[] {29,7,26,82,75,10,66,76,7,95,78,28,29,67,69};
-
     }
 
     public void buildHeap(int[] array){
-        for(int integer : array){
+        for(int integer : array){ //Add every integer to the heap.
             System.out.println("Memory Buildheap : ");
             for(int number : memory){
                 System.out.print(number + " ");
@@ -110,8 +107,6 @@ public class RSHeap {
 
     public boolean insert(int element){
         if(heapSize < (memory.length - deadspace)){
-            System.out.println("wohaou " + element);
-
             memory[heapSize] = element;
             int elementLocation = heapSize;
 
@@ -122,7 +117,7 @@ public class RSHeap {
                 parentLocation = (elementLocation / 2);
             }
 
-            while(element < memory[parentLocation]){
+            while(element < memory[parentLocation]){ //Repair the heap (percolate up).
                 swap(elementLocation, parentLocation);
                 elementLocation = parentLocation;
                 if(elementLocation % 2 == 0 && elementLocation != 0) {
@@ -152,11 +147,14 @@ public class RSHeap {
     public void deleteMin(){
         if(heapSize > 0) {
             int emptylocation = 0;
+
+            //Delete the smallest number.
             memory[emptylocation] = 0;
             int childTwoLocation = (emptylocation + 1) * 2;
             int childOneLocation = childTwoLocation - 1;
 
             while(childOneLocation < (heapSize - 1)){
+                //Check which element should be at the top of the heap.
                 if ((memory[childOneLocation] < memory[childTwoLocation]) || !(childTwoLocation < (heapSize - 1))) {
                     swap(emptylocation, childOneLocation);
                     emptylocation = childOneLocation;
@@ -173,6 +171,7 @@ public class RSHeap {
             int elementLocation = emptylocation;
             --heapSize;
 
+            //Repair the heap (percolate down).
             int parentLocation;
             if(elementLocation % 2 == 0 && elementLocation != 0) {
                 parentLocation = (elementLocation / 2) - 1;
@@ -191,6 +190,4 @@ public class RSHeap {
             }
         }
     }
-
-
 }
