@@ -1,5 +1,7 @@
 import com.sun.org.apache.xpath.internal.SourceTree;
 
+import java.util.Arrays;
+
 /**
  * Created by Vincent on 29/11/2016.
  */
@@ -8,49 +10,89 @@ public class RSHeap {
     private int heapSize;
     private int deadspace;
 
-    public RSHeap(int memorySize) {
+    public RSHeap(int memorySize, InputDisk in, OutputDisk out) {
         this.memory = new int[memorySize];
         this.heapSize = 0;
         this.deadspace = 0;
 
-        buildHeap();
+        //Read memorySize elements from in to array and build a minheap.
+        int[] array = new int[memorySize];
+        for(int i = 0; i < memorySize; ++i){
+            array [i] = in.read();
+        }
+        buildHeap(array);
+
+
+        System.out.println("Memory contents at start: ");
+        for(int number : memory){
+            System.out.print(number + " ");
+        }
+        System.out.println("");
+
+        while (!in.isEmpty()){
+            System.out.println("Memory contents: ");
+            for(int number : memory){
+                System.out.print(number + " ");
+            }
+            System.out.println("");
+
+            int smallest = findMin();
+            deleteMin();
+            out.write(smallest);
+            int next = in.read();
+            if(next >= smallest){ //next fits in this run.
+                insert(next); //add next to heap.
+            } else {
+                ++deadspace;
+                memory[memorySize - deadspace] = next;
+            }
+            if(heapSize == 0){
+                buildHeap(memory);
+                deadspace = 0;
+            }
+        }
+        while (heapSize > 0){
+            System.out.println("Memory contents in is empty: ");
+            for(int number : memory){
+                System.out.print(number + " ");
+            }
+            System.out.println("");
+            out.write(findMin());
+            deleteMin();
+        }
+        if (deadspace > 0){
+            System.out.println("Memory contents : ");
+            for(int number : memory){
+                System.out.print(number + " ");
+            }
+            System.out.println("");
+
+            int[] tempArray = Arrays.copyOfRange(memory, memory.length - deadspace, memory.length);
+            buildHeap(tempArray);
+            deadspace = 0;
+
+            System.out.println("Memory contents : ");
+            for(int number : memory){
+                System.out.print(number + " ");
+            }
+            System.out.println("");
+        }
+        while (heapSize > 0){
+            out.write(findMin());
+            deleteMin();
+        }
+
+        //int[] array = new int[] {29,7,26,82,75,10,66,76,7,95,78,28,29,67,69};
 
     }
 
-    public void buildHeap(){
-        int[] testintarray = new int[] {29,7,26,82,75,10,66,76,7,95,78,28,29,67,69};
-
-        /*
-        insert(2);
-
-        insert(3);
-
-        insert(4);
-
-        insert(1);
-        */
-
-        for(int integer : testintarray){
+    public void buildHeap(int[] array){
+        for(int integer : array){
             insert(integer);
         }
-
-
-        System.out.println("Memory ");
-        for(int integer : memory){
-            System.out.print(integer + " ");
-        }
-        System.out.println("");
-        deleteMin();
-        deleteMin();
-        deleteMin();
-        System.out.println("Memory ");
-        for(int integer : memory){
-            System.out.print(integer + " ");
-        }
-        System.out.println("");
     }
 
-    public void insert(int element){
+    public boolean insert(int element){
         if(heapSize < (memory.length - deadspace)){
 
             memory[heapSize] = element;
@@ -73,8 +115,10 @@ public class RSHeap {
                 }
             }
 
-            heapSize++;
+            ++heapSize;
+            return true;
         }
+        return false;
     }
 
     public void swap(int elementOne, int elementTwo){
@@ -109,7 +153,7 @@ public class RSHeap {
 
             swap(emptylocation, (heapSize - 1));
             int elementLocation = emptylocation;
-            heapSize--;
+            --heapSize;
 
             int parentLocation;
             if(elementLocation % 2 == 0 && elementLocation != 0) {
