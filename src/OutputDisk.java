@@ -29,5 +29,11 @@ public class OutputDisk {
         for(int number : array){
             System.out.print(number + " ");
         }
+        System.out.println(" ");
+        System.out.println(" ");
+    }
+
+    public int[] getDiskContents(){
+        return array;
     }
 }

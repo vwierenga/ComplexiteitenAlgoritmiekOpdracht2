@@ -22,19 +22,22 @@ public class RSHeap {
         }
         buildHeap(array);
 
-
+        System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
         System.out.println("Memory contents at start: ");
         for(int number : memory){
             System.out.print(number + " ");
         }
         System.out.println("");
+        out.printDiskContents();
 
         while (!in.isEmpty()){
+            System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents: ");
             for(int number : memory){
                 System.out.print(number + " ");
             }
             System.out.println("");
+            out.printDiskContents();
 
             int smallest = findMin();
             deleteMin();
@@ -47,35 +50,42 @@ public class RSHeap {
                 memory[memorySize - deadspace] = next;
             }
             if(heapSize == 0){
-                buildHeap(memory);
                 deadspace = 0;
+                buildHeap(memory);
             }
         }
         while (heapSize > 0){
+            System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents in is empty: ");
             for(int number : memory){
                 System.out.print(number + " ");
             }
             System.out.println("");
+            out.printDiskContents();
+
             out.write(findMin());
             deleteMin();
         }
         if (deadspace > 0){
+            System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents : ");
             for(int number : memory){
                 System.out.print(number + " ");
             }
             System.out.println("");
+            out.printDiskContents();
 
             int[] tempArray = Arrays.copyOfRange(memory, memory.length - deadspace, memory.length);
             buildHeap(tempArray);
             deadspace = 0;
 
+            System.out.println("Deadspace: " + deadspace + " Heap: " + heapSize);
             System.out.println("Memory contents : ");
             for(int number : memory){
                 System.out.print(number + " ");
             }
             System.out.println("");
+            out.printDiskContents();
         }
         while (heapSize > 0){
             out.write(findMin());
@@ -88,12 +98,19 @@ public class RSHeap {
 
     public void buildHeap(int[] array){
         for(int integer : array){
+            System.out.println("Memory Buildheap : ");
+            for(int number : memory){
+                System.out.print(number + " ");
+            }
+            System.out.println("");
+
             insert(integer);
         }
     }
 
     public boolean insert(int element){
         if(heapSize < (memory.length - deadspace)){
+            System.out.println("wohaou " + element);
 
             memory[heapSize] = element;
             int elementLocation = heapSize;
@@ -118,6 +135,7 @@ public class RSHeap {
             ++heapSize;
             return true;
         }
+        System.out.println("problems");
         return false;
     }
 
