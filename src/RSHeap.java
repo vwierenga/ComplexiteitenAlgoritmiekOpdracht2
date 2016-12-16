@@ -12,6 +12,8 @@ public class RSHeap {
     private int deadspace;
     private boolean debuggingMode = false; //Set this to true to see the memory and disk contents of this program while it's running.
 
+    private ArrayList<Integer> runs;
+
     public RSHeap(int memorySize, InputDisk in, OutputDisk out) {
         this.memory = new int[memorySize];
         this.heapSize = 0;
@@ -34,8 +36,8 @@ public class RSHeap {
             out.printDiskContents();
         }
 
-        ArrayList<Integer> runs = new ArrayList<>();
-        //int
+        runs = new ArrayList<>();
+        int runlength = 0;
 
         while (!in.isEmpty()){
             if(debuggingMode) {
@@ -48,6 +50,7 @@ public class RSHeap {
                 out.printDiskContents();
             }
 
+            runlength++;
             int smallest = findMin();
             deleteMin();
             out.write(smallest);
@@ -59,6 +62,8 @@ public class RSHeap {
                 memory[memorySize - deadspace] = next;
             }
             if(heapSize == 0){ //Free the deadspace and add it's contents to the heap.
+                runs.add(runlength);
+                runlength = 0;
                 deadspace = 0;
                 buildHeap(memory);
             }
@@ -73,6 +78,7 @@ public class RSHeap {
                 System.out.println("");
                 out.printDiskContents();
             }
+            runlength++;
 
             out.write(findMin());
             deleteMin();
@@ -87,6 +93,9 @@ public class RSHeap {
                 System.out.println("");
                 out.printDiskContents();
             }
+
+            runs.add(runlength);
+            runlength = 0;
 
             int[] tempArray = Arrays.copyOfRange(memory, memory.length - deadspace, memory.length);
             deadspace = 0;
@@ -103,12 +112,15 @@ public class RSHeap {
             }
         }
         while (heapSize > 0){ //Write the remaining numbers in the heap to out.
+            runlength++;
+
             out.write(findMin());
             deleteMin();
         }
+        runs.add(runlength);
     }
 
-    public void buildHeap(int[] array){
+    private void buildHeap(int[] array){
         for(int integer : array){ //Add every integer to the heap.
             if(debuggingMode) {
                 System.out.println("Memory Buildheap : ");
@@ -122,7 +134,7 @@ public class RSHeap {
         }
     }
 
-    public boolean insert(int element){
+    private boolean insert(int element){
         if(heapSize < (memory.length - deadspace)){
             memory[heapSize] = element;
             int elementLocation = heapSize;
@@ -153,17 +165,17 @@ public class RSHeap {
         return false;
     }
 
-    public void swap(int elementOne, int elementTwo){
+    private void swap(int elementOne, int elementTwo){
         int temp = memory[elementOne];
         memory[elementOne] = memory[elementTwo];
         memory[elementTwo] = temp;
     }
 
-    public int findMin(){
+    private int findMin(){
         return memory[0];
     }
 
-    public void deleteMin(){
+    private void deleteMin(){
         if(heapSize > 0) {
             int emptylocation = 0;
 
@@ -208,5 +220,16 @@ public class RSHeap {
                 }
             }
         }
+    }
+
+    public void printRuns() {
+        System.out.println("Runs: " + runs.size());
+        int inputSize = 0;
+
+        for (int i = 0; i < runs.size(); i++) {
+            System.out.println("Run: " + i + " Length: " + runs.get(i));
+            inputSize = inputSize + runs.get(i);
+        }
+        System.out.println("Average runlength: " + (inputSize / runs.size()));
     }
 }

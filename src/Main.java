@@ -3,21 +3,31 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
-        //int[] array = new int[] {29,7,26,82,75,10,66,76,7,95,78,28,29,67,69};
-        int[] array = generateIntArray();
+        int[] memorySizes = new int[] {2,4,8,16,32};
+        for (int memorySize : memorySizes) {
+            int[] inputFileLengths = new int[] {memorySize*2, memorySize*4, memorySize*8, memorySize*16, memorySize*32};
+            for(int inputFileLenght : inputFileLengths){
+                int[] array = generateIntArray(inputFileLenght);
 
-        Random rand = new Random();
-        int memorySize = rand.nextInt((10 - 3) + 1) + 3;
+                //Random rand = new Random();
+                //int memorySize = rand.nextInt((10 - 3) + 1) + 3;
 
-        InputDisk in = new InputDisk(array);
-        OutputDisk out = new OutputDisk(array.length);
+                generateOutputFile(array, memorySize);
+            }
+        }
 
-        RSHeap testheap = new RSHeap(memorySize, in, out);
-        out.printDiskContents();
+        int[] bestCase = new int[] {2,4,8,16,32,64,128,256};
+        int[] worstCase = new int[] {256,128,64,32,16,8,4,2};
+
+        generateOutputFile(bestCase, 2);
+        generateOutputFile(worstCase, 2);
     }
 
-    public static int[] generateIntArray(){
+    /**
+     * Generates an int array of a random length.
+     * @return an int array of a random lenght.
+     */
+    private static int[] generateIntArray(){
         Random rand = new Random();
         int arrayLenth = rand.nextInt((100 - 1) + 1) + 1;
         int[] array = new int[arrayLenth];
@@ -28,5 +38,39 @@ public class Main {
         }
 
         return array;
+    }
+
+    /**
+     * Generates an int array with a lenght of arrayLength.
+     * @param arrayLength The lenght of the output array.
+     * @return an int array with a lenght of arrayLength.
+     */
+    private static int[] generateIntArray(int arrayLength){
+        int[] array = new int[arrayLength];
+
+        Random rand = new Random();
+        for(int i = 0; i < arrayLength; ++i){
+            int randomNumber = rand.nextInt((100 - 1) + 1) + 1;
+            array[i] = randomNumber;
+        }
+
+        return array;
+    }
+
+    private static void generateOutputFile(int[] array, int memorySize){
+        System.out.println(" ");
+        System.out.println("----------------------------------------------------");
+        System.out.println(" ");
+
+        InputDisk in = new InputDisk(array);
+        OutputDisk out = new OutputDisk(array.length);
+
+        RSHeap testheap = new RSHeap(memorySize, in, out);
+        out.printDiskContents();
+
+        System.out.println("Input file size (N): " + array.length);
+        System.out.println("Memory size (H): " + memorySize);
+
+        testheap.printRuns();
     }
 }
